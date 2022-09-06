@@ -1,0 +1,7 @@
+#testing file
+Program.cs
+
+#build files
+CLICarry.csproj
+bin
+obj
