@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Reflection;
 
 namespace CLICarry
@@ -11,12 +10,23 @@ namespace CLICarry
             MemberInfo[] MyMemberInfo = typeof(T).GetMethods();
             foreach (MemberInfo member in MyMemberInfo)
             {
-                Command? attribute = (Command)(Attribute.GetCustomAttribute(member, typeof(Command)));
-                if (attribute == null)
+                Command? attribute = (Command?)(Attribute.GetCustomAttribute(member, typeof(Command)));
+                if (attribute != null)
                 {
-                    continue;
+                    commands.Add(attribute);
                 }
-                commands.Add(new Command());
+            }
+            foreach (Command command in commands)
+            {
+                if (input[0] == command.Name) //check if command matches
+                {
+                    if (input.Length - 1 != command.Flags.Length)
+                    {
+
+                    }
+                    return;
+                }
+                //non command error
             }
         }
     }
