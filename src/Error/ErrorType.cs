@@ -3,6 +3,9 @@ namespace CLICarry
     public enum ErrorType
     {
         InvalidCommand,
-        InvalidFlag
+        InvalidFlag,
+        TooManyFlags,
+        InvalidValue,
+        NoCommandProvided
     }
 }

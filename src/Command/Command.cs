@@ -26,7 +26,7 @@ namespace CLICarry
         public Command(string name, string flag1, FlagValueType value1, string flag2, FlagValueType value2, string flag3, FlagValueType value3)
         {
             Name = name;
-            Flags = new Flag[1];
+            Flags = new Flag[3];
             Flags[0] = new Flag(flag1, value1);
             Flags[1] = new Flag(flag2, value2);
             Flags[2] = new Flag(flag3, value3);
@@ -34,7 +34,7 @@ namespace CLICarry
         public Command(string name, string flag1, FlagValueType value1, string flag2, FlagValueType value2, string flag3, FlagValueType value3, string flag4, FlagValueType value4)
         {
             Name = name;
-            Flags = new Flag[1];
+            Flags = new Flag[4];
             Flags[0] = new Flag(flag1, value1);
             Flags[1] = new Flag(flag2, value2);
             Flags[2] = new Flag(flag3, value3);
@@ -43,7 +43,7 @@ namespace CLICarry
         public Command(string name, string flag1, FlagValueType value1, string flag2, FlagValueType value2, string flag3, FlagValueType value3, string flag4, FlagValueType value4, string flag5, FlagValueType value5)
         {
             Name = name;
-            Flags = new Flag[1];
+            Flags = new Flag[5];
             Flags[0] = new Flag(flag1, value1);
             Flags[1] = new Flag(flag2, value2);
             Flags[2] = new Flag(flag3, value3);

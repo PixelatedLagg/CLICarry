@@ -6,28 +6,141 @@ namespace CLICarry
     {
         public static void Run<T>(string[] input) where T : class, CLI
         {
+            T instance = Activator.CreateInstance<T>();
+            if (input.Length == 0) //check if command is provided
+            {
+                instance.Error(new ErrorContext(ErrorType.NoCommandProvided, null, null, null));
+                return;
+            }
+            if (input[0].Substring(1)[0] == '-')
+            {
+                instance.Error(new ErrorContext(ErrorType.NoCommandProvided, input[0], null, null));
+                return;
+            }
             List<Command> commands = new List<Command>();
-            MemberInfo[] MyMemberInfo = typeof(T).GetMethods();
-            foreach (MemberInfo member in MyMemberInfo)
+            MethodInfo[] methods = typeof(T).GetMethods();
+            int flagCount = 0;
+            bool checkingType = false;
+            List<(string, object?)> flags = new List<(string, object?)>();
+            Flag currentFlag = new Flag("default");
+            foreach (MethodInfo method in methods)
             {
-                Command? attribute = (Command?)(Attribute.GetCustomAttribute(member, typeof(Command)));
-                if (attribute != null)
+                Command? command = (Command?)(Attribute.GetCustomAttribute(method, typeof(Command)));
+                if (command != null)
                 {
-                    commands.Add(attribute);
-                }
-            }
-            foreach (Command command in commands)
-            {
-                if (input[0] == command.Name) //check if command matches
-                {
-                    if (input.Length - 1 != command.Flags.Length)
+                    if (input[0] == command.Name) //check if command matches
                     {
-
+                        for (int i = 1; i < input.Length; i++)
+                        {
+                            if (input[i][0] == '-') //check if string is a flag
+                            {
+                                if (checkingType)
+                                {
+                                    checkingType = false;
+                                    switch (currentFlag.FlagValueType)
+                                    {
+                                        case FlagValueType.Int:
+                                            int intResult;
+                                            if (Int32.TryParse(input[i], out intResult))
+                                            {
+                                                flags.Add((currentFlag.Name, intResult));
+                                                continue;
+                                            }
+                                            instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
+                                            return;
+                                        case FlagValueType.Double:
+                                            double doubleResult;
+                                            if (Double.TryParse(input[i], out doubleResult))
+                                            {
+                                                flags.Add((currentFlag.Name, doubleResult));
+                                                continue;
+                                            }
+                                            instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
+                                            return;
+                                        case FlagValueType.String:
+                                            flags.Add((currentFlag.Name, input[i]));
+                                            continue;
+                                        case FlagValueType.Ulong:
+                                            ulong ulongResult;
+                                            if (UInt64.TryParse(input[i], out ulongResult))
+                                            {
+                                                flags.Add((currentFlag.Name, ulongResult));
+                                                continue;
+                                            }
+                                            instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
+                                            return;
+                                    }
+                                }
+                                currentFlag = command.Flags.First(x => x.Name == input[i].Substring(1));
+                                flagCount++;
+                                if (flagCount > command.Flags.Length) //check for too many flags
+                                {
+                                    instance.Error(new ErrorContext(ErrorType.TooManyFlags, input[0], input[i], null));
+                                    return;
+                                }
+                                if (input[i].Substring(1) != currentFlag.Name) //check for invalid flag
+                                {
+                                    instance.Error(new ErrorContext(ErrorType.InvalidFlag, input[0], input[i], null));
+                                    return;
+                                }
+                                if (currentFlag.FlagValueType != FlagValueType.None) //check if looking for value
+                                {
+                                    checkingType = true;
+                                }
+                                else
+                                {
+                                    flags.Add((currentFlag.Name, null));
+                                }
+                            }
+                            else
+                            {
+                                if (!checkingType)
+                                {
+                                    instance.Error(new ErrorContext(ErrorType.InvalidFlag, input[0], input[i], null));
+                                    return;
+                                }
+                                checkingType = false;
+                                switch (currentFlag.FlagValueType)
+                                {
+                                    case FlagValueType.Int:
+                                        int intResult;
+                                        if (Int32.TryParse(input[i], out intResult))
+                                        {
+                                            flags.Add((currentFlag.Name, intResult));
+                                            continue;
+                                        }
+                                        instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
+                                        return;
+                                    case FlagValueType.Double:
+                                        double doubleResult;
+                                        if (Double.TryParse(input[i], out doubleResult))
+                                        {
+                                            flags.Add((currentFlag.Name, doubleResult));
+                                            continue;
+                                        }
+                                        instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
+                                        return;
+                                    case FlagValueType.String:
+                                        flags.Add((currentFlag.Name, input[i]));
+                                        break;
+                                    case FlagValueType.Ulong:
+                                        ulong ulongResult;
+                                        if (UInt64.TryParse(input[i], out ulongResult))
+                                        {
+                                            flags.Add((currentFlag.Name, ulongResult));
+                                            continue;
+                                        }
+                                        instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
+                                        return;
+                                }
+                            }
+                        }
+                        method.Invoke(instance, new object[] { new CommandArgs(flags) });
+                        return;
                     }
-                    return;
                 }
-                //non command error
             }
+            instance.Error(new ErrorContext(ErrorType.InvalidCommand, input[0], null, null));
         }
     }
 }
