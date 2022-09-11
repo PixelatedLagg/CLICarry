@@ -29,18 +29,25 @@ namespace CLICarry
         }
         public bool HasFlags(params string[] names)
         {
+            bool hasFlag = false;
             foreach (string name in names)
             {
                 foreach (Flag flag in this)
                 {
                     if (flag.Name == name)
                     {
-                        continue;
+                        hasFlag = true;
+                        break;
                     }
+                }
+                if (hasFlag)
+                {
+                    hasFlag = false;
+                    continue;
                 }
                 return false;
             }
-            return false;
+            return true;
         }
     }
 }

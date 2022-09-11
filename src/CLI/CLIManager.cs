@@ -21,7 +21,7 @@ namespace CLICarry
             MethodInfo[] methods = typeof(T).GetMethods();
             int flagCount = 0;
             bool checkingType = false;
-            List<(string, object?)> flags = new List<(string, object?)>();
+            FlagList flags = new FlagList();
             Flag currentFlag = new Flag("default");
             foreach (MethodInfo method in methods)
             {
@@ -43,7 +43,7 @@ namespace CLICarry
                                             int intResult;
                                             if (Int32.TryParse(input[i], out intResult))
                                             {
-                                                flags.Add((currentFlag.Name, intResult));
+                                                flags.Add(currentFlag.SetValue(intResult));
                                                 continue;
                                             }
                                             instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
@@ -52,19 +52,19 @@ namespace CLICarry
                                             double doubleResult;
                                             if (Double.TryParse(input[i], out doubleResult))
                                             {
-                                                flags.Add((currentFlag.Name, doubleResult));
+                                                flags.Add(currentFlag.SetValue(doubleResult));
                                                 continue;
                                             }
                                             instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
                                             return;
                                         case FlagValueType.String:
-                                            flags.Add((currentFlag.Name, input[i]));
+                                            flags.Add(currentFlag.SetValue(input[i]));
                                             continue;
                                         case FlagValueType.Ulong:
                                             ulong ulongResult;
                                             if (UInt64.TryParse(input[i], out ulongResult))
                                             {
-                                                flags.Add((currentFlag.Name, ulongResult));
+                                                flags.Add(currentFlag.SetValue(ulongResult));
                                                 continue;
                                             }
                                             instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
@@ -89,7 +89,7 @@ namespace CLICarry
                                 }
                                 else
                                 {
-                                    flags.Add((currentFlag.Name, null));
+                                    flags.Add(currentFlag.SetValue(null));
                                 }
                             }
                             else
@@ -106,7 +106,7 @@ namespace CLICarry
                                         int intResult;
                                         if (Int32.TryParse(input[i], out intResult))
                                         {
-                                            flags.Add((currentFlag.Name, intResult));
+                                            flags.Add(currentFlag.SetValue(intResult));
                                             continue;
                                         }
                                         instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
@@ -115,19 +115,19 @@ namespace CLICarry
                                         double doubleResult;
                                         if (Double.TryParse(input[i], out doubleResult))
                                         {
-                                            flags.Add((currentFlag.Name, doubleResult));
+                                            flags.Add(currentFlag.SetValue(doubleResult));
                                             continue;
                                         }
                                         instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
                                         return;
                                     case FlagValueType.String:
-                                        flags.Add((currentFlag.Name, input[i]));
+                                        flags.Add(currentFlag.SetValue(input[i]));
                                         break;
                                     case FlagValueType.Ulong:
                                         ulong ulongResult;
                                         if (UInt64.TryParse(input[i], out ulongResult))
                                         {
-                                            flags.Add((currentFlag.Name, ulongResult));
+                                            flags.Add(currentFlag.SetValue(ulongResult));
                                             continue;
                                         }
                                         instance.Error(new ErrorContext(ErrorType.InvalidValue, input[0], input[i - 1], input[i]));
