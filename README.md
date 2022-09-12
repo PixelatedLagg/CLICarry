@@ -8,7 +8,7 @@ dotnet add package CLICarry
 ```
 
 ## Important Links
-[Nuget Page](https://www.nuget.org/packages/CLICarry) | [Github](https://github.com/PixelatedLagg/CLICarry)
+[Nuget Page](https://www.nuget.org/packages/CLICarry)
 
 ## Example:
 ```c#
