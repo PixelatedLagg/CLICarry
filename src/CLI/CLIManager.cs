@@ -1,13 +1,19 @@
+using System;
+using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace CLICarry
 {
+    /// <summary>Manages CLI input.</summary>
     public static class CLIManager
     {
+        /// <summary>Run input through a CLI.</summary>
+        /// <param name="input">An array of Strings to input into the CLI.</param>
         public static void Run<T>(string[] input) where T : class, CLI
         {
             T instance = Activator.CreateInstance<T>();
-            if (input.Length == 0) //check if command is provided
+            if (input.Length == 0)
             {
                 instance.Error(new ErrorContext(ErrorType.NoCommandProvided, null, null, null));
                 return;
@@ -25,14 +31,14 @@ namespace CLICarry
             Flag currentFlag = new Flag("default");
             foreach (MethodInfo method in methods)
             {
-                Command? command = (Command?)(Attribute.GetCustomAttribute(method, typeof(Command)));
+                Command command = (Command)(Attribute.GetCustomAttribute(method, typeof(Command)));
                 if (command != null)
                 {
-                    if (input[0] == command.Name) //check if command matches
+                    if (input[0] == command.Name)
                     {
                         for (int i = 1; i < input.Length; i++)
                         {
-                            if (input[i][0] == '-') //check if string is a flag
+                            if (input[i][0] == '-')
                             {
                                 if (checkingType)
                                 {
@@ -73,17 +79,17 @@ namespace CLICarry
                                 }
                                 currentFlag = command.Flags.First(x => x.Name == input[i].Substring(1));
                                 flagCount++;
-                                if (flagCount > command.Flags.Length) //check for too many flags
+                                if (flagCount > command.Flags.Length)
                                 {
                                     instance.Error(new ErrorContext(ErrorType.TooManyFlags, input[0], input[i], null));
                                     return;
                                 }
-                                if (input[i].Substring(1) != currentFlag.Name) //check for invalid flag
+                                if (input[i].Substring(1) != currentFlag.Name)
                                 {
                                     instance.Error(new ErrorContext(ErrorType.InvalidFlag, input[0], input[i], null));
                                     return;
                                 }
-                                if (currentFlag.FlagValueType != FlagValueType.None) //check if looking for value
+                                if (currentFlag.FlagValueType != FlagValueType.None)
                                 {
                                     checkingType = true;
                                 }
