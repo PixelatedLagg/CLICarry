@@ -10,7 +10,7 @@ dotnet add package CLICarry
 ## Important Links
 [Nuget Page](https://www.nuget.org/packages/CLICarry)
 
-## Example:
+## Example
 ```c#
 using System;
 using CLICarry;
